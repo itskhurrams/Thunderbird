@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Thunderbird.Application\Thunderbird.Application.csproj" />
+    <ProjectReference Include="..\Thunderbird.Infrastructure.Caching\Thunderbird.Infrastructure.Caching.csproj" />
+    <ProjectReference Include="..\Thunderbird.Infrastructure.Persistance\Thunderbird.Infrastructure.Persistance.csproj" />
+  </ItemGroup>
+
+</Project>
