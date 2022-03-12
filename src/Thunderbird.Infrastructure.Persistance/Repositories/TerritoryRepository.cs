@@ -1,5 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
+
 using System.Data;
+
 using Thunderbird.Domain.Entities;
 using Thunderbird.Domain.Interfaces;
 using Thunderbird.Infrastructure.Common;
@@ -24,31 +26,16 @@ namespace Thunderbird.Infrastructure.Persistance.Repositories {
         #endregion Parameters
         #region Functions
         private static Division Mapper(IDataReader reader) {
-            var division = new Division();
-            if (reader[DIVISIONID] != null && reader[DIVISIONID] != DBNull.Value) {
-                division.DivisionId = Conversion.ToByte(reader[DIVISIONID]);
-            }
-            if (reader[PROVINCEID] != null && reader[PROVINCEID] != DBNull.Value) {
-                division.ProvinceId = Conversion.ToByte(reader[PROVINCEID]);
-            }
-            if (reader[DIVISIONNAME] != null && reader[DIVISIONNAME] != DBNull.Value) {
-                division.DivisionName = Conversion.ToString(reader[DIVISIONNAME]);
-            }
-            if (reader[ISACTIVE] != null && reader[ISACTIVE] != DBNull.Value) {
-                division.IsActive = Conversion.ToBool(reader[ISACTIVE]);
-            }
-            if (reader[CREATEDBY] != null && reader[CREATEDBY] != DBNull.Value) {
-                division.CreatedBy = Conversion.ToInt(reader[CREATEDBY]);
-            }
-            if (reader[CREATEDDATE] != null && reader[CREATEDDATE] != DBNull.Value) {
-                division.CreatedDate = Conversion.ToDateTime(reader[CREATEDDATE]);
-            }
-            if (reader[UPDATEDBY] != null && reader[UPDATEDBY] != DBNull.Value) {
-                division.UpdateBy = Conversion.ToInt(reader[UPDATEDBY]);
-            }
-            if (reader[UPDATEDDATE] != null && reader[UPDATEDDATE] != DBNull.Value) {
-                division.UpdateDate = Conversion.ToDateTime(reader[UPDATEDDATE]);
-            }
+            Division division = new() {
+                DivisionId = (reader[DIVISIONID] != DBNull.Value) ? Conversion.ToByte(reader[DIVISIONID]) : byte.MinValue,
+                ProvinceId = (reader[PROVINCEID] != DBNull.Value) ? Conversion.ToByte(reader[PROVINCEID]) : byte.MinValue,
+                DivisionName = (reader[DIVISIONNAME] != DBNull.Value) ? Conversion.ToString(reader[DIVISIONNAME]) : string.Empty,
+                IsActive = (reader[ISACTIVE] != DBNull.Value) ? Conversion.ToBool(reader[ISACTIVE]) : false,
+                CreatedBy = (reader[CREATEDBY] != DBNull.Value) ? Conversion.ToInt(reader[CREATEDBY]) : 0,
+                CreatedDate = (reader[CREATEDDATE] != DBNull.Value) ? Conversion.ToDateTime(reader[CREATEDDATE]) : DateTime.MinValue,
+                UpdateBy = (reader[UPDATEDBY] != DBNull.Value) ? Conversion.ToInt(reader[UPDATEDBY]) : 0,
+                UpdateDate = (reader[UPDATEDDATE] != DBNull.Value) ? Conversion.ToDateTime(reader[UPDATEDDATE]) : DateTime.MinValue
+            };
             return division;
         }
         public async Task<IList<Division>> GetDivisions(bool? isActive = null) {
@@ -64,9 +51,7 @@ namespace Thunderbird.Infrastructure.Persistance.Repositories {
                     return divisionList;
                 }
             }
-            catch {
-                throw;
-            }
+            finally { }
         }
         #endregion Functions
     }
