@@ -1,23 +1,17 @@
-﻿using Thunderbird.Domain.Entities;
-using Thunderbird.Domain.Interfaces;
-
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Data.Common;
+using Thunderbird.Domain.Entities;
+using Thunderbird.Domain.Interfaces;
 using Thunderbird.Infrastructure.Common;
-using Microsoft.Extensions.Configuration;
-using System.Data.SqlClient;
-
-namespace Thunderbird.Infrastructure.Persistance {
+namespace Thunderbird.Infrastructure.Persistance.Repositories {
     public class TerritoryRepository : ITerritoryRepository {
-        private readonly IConfiguration _configuration;
-        public TerritoryRepository(IConfiguration configuration) {
-            _configuration = configuration;
+        private readonly IBaseRepository _baseRepository;
+        public TerritoryRepository(IBaseRepository baseRepository) {
+            _baseRepository = baseRepository;
         }
-
         #region SQL Procedures
         protected const string PROC_DIVISION_GETALL = "[dbo].[Proc_Division_GetAll]";
         #endregion SQL Procedures
-
         #region Parameters
         protected const string DIVISIONID = "division_id";
         protected const string PROVINCEID = "province_id";
@@ -28,7 +22,6 @@ namespace Thunderbird.Infrastructure.Persistance {
         protected const string UPDATEDBY = "updated_by";
         protected const string UPDATEDDATE = "updated_date";
         #endregion Parameters
-
         #region Functions
         private static Division Mapper(IDataReader reader) {
             var division = new Division();
@@ -59,17 +52,21 @@ namespace Thunderbird.Infrastructure.Persistance {
             return division;
         }
         public async Task<IList<Division>> GetDivisions(bool? isActive = null) {
-
-            IList<Division> divisionList = new List<Division>();
-            using SqlConnection sqlConnection = new(_configuration["Data:ConnectionString"]);
-            sqlConnection.OpenAsync().Wait();
-            using SqlCommand sqlCommand = new(PROC_DIVISION_GETALL, sqlConnection);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            sqlCommand.Parameters.Add(new(ISACTIVE, isActive == null ? DBNull.Value : isActive));
-            using var reader = await sqlCommand.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-                divisionList.Add(Mapper(reader));
-            return divisionList;
+            try {
+                IList<Division> divisionList = new List<Division>();
+                using (SqlConnection sqlConnection = _baseRepository.GetConnection()) {
+                    using (SqlCommand sqlCommand = _baseRepository.GetSqlCommand(sqlConnection, PROC_DIVISION_GETALL)) {
+                        sqlCommand.Parameters.Add(_baseRepository.GetInParameter(ISACTIVE, SqlDbType.Int, isActive == null ? DBNull.Value : isActive));
+                        using var reader = await sqlCommand.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
+                            divisionList.Add(Mapper(reader));
+                    }
+                    return divisionList;
+                }
+            }
+            catch {
+                throw;
+            }
         }
         #endregion Functions
     }

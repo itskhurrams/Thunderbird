@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using Thunderbird.Infrastructure.Common;
 
-namespace Thunderbird.Infrastructure.Persistance {
+namespace Thunderbird.Infrastructure.Persistance.Repositories {
     public class UserRepository : IUserRepository {
         public UserRepository() {
         }
