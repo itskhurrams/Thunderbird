@@ -23,7 +23,6 @@ namespace Thunderbird.API {
         private static void RegisterServices(IServiceCollection services) {
             DependencyContainer.RegisterServices(services);
         }
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             if (env.IsDevelopment()) {
                 app.UseSwagger();
