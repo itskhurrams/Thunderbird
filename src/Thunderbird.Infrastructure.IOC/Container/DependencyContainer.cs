@@ -17,12 +17,14 @@ namespace Thunderbird.Infrastructure.IOC.Container {
         private static void ServicesRegistration(IServiceCollection services) {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITerritoryService, TerritoryService>();
+            services.AddScoped<ICaptchaService, CaptchaService>();
         }
         private static void RepositoryRegistration(IServiceCollection services) {
             services.AddScoped<IBaseRepository, BaseRepository>();
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITerritoryRepository, TerritoryRepository>();
+            services.AddScoped<ICaptchaRepository, CaptchaRepository>();
             services.AddScoped<IMemoryCacheProvider, MemoryCacheProvider>();
         }
     }
