@@ -34,6 +34,9 @@ namespace Thunderbird.Infrastructure.Persistance.Repositories {
             User userAccount = new() {
                 UserId = (reader[USERID] != DBNull.Value) ? Conversion.ToInt(reader[USERID]) : 0,
                 LoginName = (reader[LOGINNAME] != DBNull.Value) ? Conversion.ToString(reader[LOGINNAME]) : string.Empty,
+                // Intentionally never populated from the result set - the password must never
+                // travel through the domain model any further than this repository needs it to.
+                LoginPassword = string.Empty,
                 FirstName = (reader[FIRSTNAME] != DBNull.Value) ? Conversion.ToString(reader[FIRSTNAME]) : string.Empty,
                 LastName = (reader[LASTNAME] != DBNull.Value) ? Conversion.ToString(reader[LASTNAME]) : string.Empty,
                 IsActive = (reader[ISACTIVE] != DBNull.Value) ? Conversion.ToBool(reader[ISACTIVE]) : false,
@@ -44,20 +47,13 @@ namespace Thunderbird.Infrastructure.Persistance.Repositories {
             };
             return userAccount;
         }
-        public async Task<User> Login(string loginName, string loginPassword) {
-            try {
-                User userAccount = new();
-                using SqlConnection sqlConnection = _baseRepository.GetConnection();
-                using (SqlCommand sqlCommand = _baseRepository.GetSqlCommand(sqlConnection, PROC_USER_LOGIN)) {
-                    sqlCommand.Parameters.Add(_baseRepository.GetInParameter(LOGINNAME, SqlDbType.NVarChar, loginName));
-                    sqlCommand.Parameters.Add(_baseRepository.GetInParameter(LOGINPASSWORD, SqlDbType.NVarChar, loginPassword));
-                    using var reader = await sqlCommand.ExecuteReaderAsync();
-                    if (await reader.ReadAsync())
-                        userAccount = Mapper(reader);
-                }
-                return userAccount;
-            }
-            finally { }
+        public async Task<User?> Login(string loginName, string loginPassword) {
+            using SqlConnection sqlConnection = _baseRepository.GetConnection();
+            using SqlCommand sqlCommand = _baseRepository.GetSqlCommand(sqlConnection, PROC_USER_LOGIN);
+            sqlCommand.Parameters.Add(_baseRepository.GetInParameter(LOGINNAME, SqlDbType.NVarChar, loginName));
+            sqlCommand.Parameters.Add(_baseRepository.GetInParameter(LOGINPASSWORD, SqlDbType.NVarChar, loginPassword));
+            using var reader = await sqlCommand.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? Mapper(reader) : null;
         }
         #endregion Functions
     }

@@ -11,7 +11,8 @@ namespace Thunderbird.Infrastructure.Persistance.Repositories {
         private readonly IConfiguration _configuration;
         public BaseRepository(IConfiguration configuration) {
             _configuration = configuration;
-            ConnectionString = _configuration["Data:ConnectionString"];
+            ConnectionString = _configuration["Data:ConnectionString"]
+                ?? throw new InvalidOperationException("Data:ConnectionString is not configured.");
         }
         public string GetConnectionString() {
             return ConnectionString;
