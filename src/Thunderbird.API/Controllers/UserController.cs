@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
+using Thunderbird.API.Models;
 using Thunderbird.Application.Interfaces;
-using Thunderbird.Domain.Entities;
 
 namespace Thunderbird.API.Controllers {
     public class UserController : BaseController {
@@ -9,9 +9,14 @@ namespace Thunderbird.API.Controllers {
         public UserController(IUserService userService) {
             _userService = userService;
         }
-       [HttpPost]
-        public async Task<User> Login(string loginName , string loginPassword) {
-            return await _userService.Login(loginName, loginPassword);
+
+        [HttpPost]
+        public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest request) {
+            var user = await _userService.Login(request.LoginName, request.LoginPassword);
+            if (user is null) {
+                return Unauthorized();
+            }
+            return Ok(UserResponse.FromUser(user));
         }
     }
 }

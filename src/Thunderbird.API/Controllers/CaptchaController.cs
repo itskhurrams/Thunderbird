@@ -1,18 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Thunderbird.API.Models;
 using Thunderbird.Application.Interfaces;
-using Thunderbird.Domain.Entities;
 
 namespace Thunderbird.API.Controllers {
     public class CaptchaController : BaseController {
-        private readonly ICaptchaService  _captchaService;
+        private readonly ICaptchaService _captchaService;
         public CaptchaController(ICaptchaService captchaService) {
             _captchaService = captchaService;
         }
+
         [HttpGet]
-        public async Task<CaptchaInfo> GetCaptcha() {
-            return await _captchaService.GetCaptcha();
+        public async Task<CaptchaResponse> GetCaptcha() {
+            var captchaInfo = await _captchaService.GetCaptcha();
+            return CaptchaResponse.FromCaptchaInfo(captchaInfo);
+        }
+
+        [HttpPost("validate")]
+        public async Task<ActionResult<bool>> Validate(CaptchaValidationRequest request) {
+            bool isValid = await _captchaService.IsValid(request.Id, request.CaptchaCode);
+            return isValid ? Ok(true) : Unauthorized(false);
         }
     }
-
 }
