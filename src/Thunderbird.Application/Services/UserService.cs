@@ -8,13 +8,8 @@ namespace Thunderbird.Application.Services {
        public UserService(IUserRepository userRepository) {
             _userRepository = userRepository;
         }
-        public async Task<User> Login(string loginName, string loginPassword) {
-            try {
-                return await _userRepository.Login(loginName, loginPassword);
-            }
-            catch {
-                throw;
-            }
+        public async Task<User?> Login(string loginName, string loginPassword) {
+            return await _userRepository.Login(loginName, loginPassword);
         }
     }
 }
