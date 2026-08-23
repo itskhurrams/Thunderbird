@@ -10,7 +10,7 @@ namespace Thunderbird.Infrastructure.Caching {
             _memorycache = memorycache;
         }
 
-        public T GetFromCache<T>(string key) where T : class {
+        public T? GetFromCache<T>(string key) where T : class {
             var cachedResponse = _memorycache.Get(key);
             return cachedResponse as T;
         }
