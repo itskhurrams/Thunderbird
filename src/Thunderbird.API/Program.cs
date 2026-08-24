@@ -1,3 +1,5 @@
+using Thunderbird.Infrastructure.Logging;
+
 namespace Thunderbird.API {
     public class Program {
         public static void Main(string[] args) {
@@ -6,6 +8,7 @@ namespace Thunderbird.API {
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseThunderbirdLogging()
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.UseStartup<Startup>();
                 });

@@ -18,6 +18,7 @@ namespace Thunderbird.Infrastructure.IOC.Container {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITerritoryService, TerritoryService>();
             services.AddScoped<ICaptchaService, CaptchaService>();
+            services.AddScoped<ITokenService, TokenService>();
         }
         private static void RepositoryRegistration(IServiceCollection services) {
             services.AddScoped<IBaseRepository, BaseRepository>();

@@ -12,26 +12,42 @@ namespace Thunderbird.Application.Services {
     public class CaptchaService : ICaptchaService {
         private const string AllowedChars = "0123456789";
         private const int CodeLength = 4;
+        private static readonly TimeSpan CaptchaLifetime = TimeSpan.FromMinutes(5);
 
         private readonly ICaptchaRepository _captchaRepository;
-        public CaptchaService(ICaptchaRepository captchaRepository) {
+        private readonly IMemoryCacheProvider _memoryCacheProvider;
+        public CaptchaService(ICaptchaRepository captchaRepository, IMemoryCacheProvider memoryCacheProvider) {
             _captchaRepository = captchaRepository;
+            _memoryCacheProvider = memoryCacheProvider;
         }
 
         public async Task<CaptchaInfo> GetCaptcha() {
             string randomCode = GenerateRandomCode();
+            long id = await _captchaRepository.Insert(randomCode);
 
-            CaptchaInfo captchaInfo = new() {
-                Id = await _captchaRepository.Insert(randomCode),
+            // The DB row has no expiry/used-once concept, so freshness and single-use
+            // are enforced here via a short-lived cache entry keyed by the captcha id.
+            _memoryCacheProvider.SetCache(CacheKey(id), randomCode, DateTimeOffset.UtcNow.Add(CaptchaLifetime));
+
+            return new CaptchaInfo {
+                Id = id,
                 CaptchaCode = randomCode,
                 Captcha = GetCaptchaImage(randomCode)
             };
-            return captchaInfo;
         }
 
         public async Task<bool> IsValid(long id, string captchaCode) {
+            string cacheKey = CacheKey(id);
+            string? issuedCode = _memoryCacheProvider.GetFromCache<string>(cacheKey);
+            if (issuedCode is null) {
+                return false;
+            }
+            _memoryCacheProvider.ClearCache(cacheKey);
+
             return await _captchaRepository.IsValid(id, captchaCode);
         }
+
+        private static string CacheKey(long id) => $"captcha:{id}";
 
         private static string GenerateRandomCode() {
             Span<char> code = stackalloc char[CodeLength];

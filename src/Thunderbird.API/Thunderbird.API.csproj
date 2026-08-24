@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Thunderbird.Infrastructure.IOC\Thunderbird.Infrastructure.IOC.csproj" />
+    <ProjectReference Include="..\Thunderbird.Infrastructure.Logging\Thunderbird.Infrastructure.Logging.csproj" />
   </ItemGroup>
 
 </Project>
