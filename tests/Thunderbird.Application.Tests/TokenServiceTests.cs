@@ -25,7 +25,9 @@ namespace Thunderbird.Application.Tests {
                 LoginName = "jdoe",
                 LoginPassword = string.Empty,
                 FirstName = "John",
-                LastName = "Doe"
+                LastName = "Doe",
+                Email = "jdoe@example.com",
+                PhoneNumber = "+12025550123"
             };
 
             string token = service.GenerateToken(user);
@@ -50,7 +52,7 @@ namespace Thunderbird.Application.Tests {
         public async Task GenerateToken_RejectsWrongSigningKey() {
             var settings = CreateSettings();
             var service = new TokenService(Options.Create(settings));
-            var user = new User { UserId = 1, LoginName = "a", LoginPassword = "", FirstName = "A", LastName = "B" };
+            var user = new User { UserId = 1, LoginName = "a", LoginPassword = "", FirstName = "A", LastName = "B", Email = "a@example.com", PhoneNumber = "+12025550100" };
 
             string token = service.GenerateToken(user);
 
