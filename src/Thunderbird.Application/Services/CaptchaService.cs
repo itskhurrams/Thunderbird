@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -10,7 +9,6 @@ using Thunderbird.Domain.Interfaces;
 
 namespace Thunderbird.Application.Services {
     public class CaptchaService : ICaptchaService {
-        private const string AllowedChars = "0123456789";
         private const int CodeLength = 4;
         private static readonly TimeSpan CaptchaLifetime = TimeSpan.FromMinutes(5);
 
@@ -22,7 +20,7 @@ namespace Thunderbird.Application.Services {
         }
 
         public async Task<CaptchaInfo> GetCaptcha() {
-            string randomCode = GenerateRandomCode();
+            string randomCode = NumericCodeGenerator.Generate(CodeLength);
             long id = await _captchaRepository.Insert(randomCode);
 
             // The DB row has no expiry/used-once concept, so freshness and single-use
@@ -48,14 +46,6 @@ namespace Thunderbird.Application.Services {
         }
 
         private static string CacheKey(long id) => $"captcha:{id}";
-
-        private static string GenerateRandomCode() {
-            Span<char> code = stackalloc char[CodeLength];
-            for (int i = 0; i < CodeLength; i++) {
-                code[i] = AllowedChars[RandomNumberGenerator.GetInt32(AllowedChars.Length)];
-            }
-            return new string(code);
-        }
 
         private static byte[] GetCaptchaImage(string checkCode) {
             using Image<Rgba32> image = new(checkCode.Length * 20, 30);
