@@ -32,7 +32,18 @@ namespace Thunderbird.API {
             AddCors(services);
             AddRateLimiting(services);
             AddAuthentication(services);
+            AddNotificationOptions(services);
             RegisterServices(services);
+        }
+        private void AddNotificationOptions(IServiceCollection services) {
+            services.AddOptions<EmailSettings>()
+                .Bind(_configuration.GetSection("Email"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<WhatsAppSettings>()
+                .Bind(_configuration.GetSection("WhatsApp"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
         }
         private void AddCors(IServiceCollection services) {
             string[] allowedOrigins = _configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
