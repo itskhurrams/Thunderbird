@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Thunderbird.Application\Thunderbird.Application.csproj" />
     <ProjectReference Include="..\Thunderbird.Infrastructure.Caching\Thunderbird.Infrastructure.Caching.csproj" />
+    <ProjectReference Include="..\Thunderbird.Infrastructure.Notifications\Thunderbird.Infrastructure.Notifications.csproj" />
     <ProjectReference Include="..\Thunderbird.Infrastructure.Persistance\Thunderbird.Infrastructure.Persistance.csproj" />
   </ItemGroup>
 
